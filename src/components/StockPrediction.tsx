@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { sendMessage } from "@/utils/xai-api";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from "lucide-react";
 
 interface StockPredictionProps {
   data: Array<{
@@ -11,7 +12,6 @@ interface StockPredictionProps {
 }
 
 export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
-  // Simple moving average prediction
   const calculatePrediction = () => {
     const lastPrice = data[0].close;
     const ma20 = data.slice(0, 20).reduce((acc, curr) => acc + curr.close, 0) / 20;
@@ -24,7 +24,6 @@ export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
     };
   };
 
-  // AI-powered prediction
   const { data: aiPrediction, isLoading } = useQuery({
     queryKey: ["aiPrediction", symbol, data[0]?.close],
     queryFn: async () => {
@@ -37,6 +36,21 @@ export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
 
   const prediction = calculatePrediction();
 
+  const formatAIPrediction = (prediction: string | undefined) => {
+    if (!prediction) return null;
+    
+    const parts = prediction.split(',').map(part => part.trim());
+    if (parts.length !== 3) return null;
+
+    const direction = parts[0].includes('UP') ? 'UP' : 'DOWN';
+    const percentage = parts[1].replace('PERCENTAGE:', '').trim();
+    const reasoning = parts[2].replace('REASONING:', '').trim();
+
+    return { direction, percentage, reasoning };
+  };
+
+  const aiResult = formatAIPrediction(aiPrediction);
+
   return (
     <Card>
       <CardHeader>
@@ -45,7 +59,7 @@ export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
       <CardContent>
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Technical Analysis</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Technical Analysis</h3>
             <div className="text-2xl font-bold">
               Predicted Movement: 
               <span className={prediction.direction === "up" ? "text-green-500" : "text-red-500"}>
@@ -55,19 +69,39 @@ export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
             <div className="text-lg">
               Predicted Next Price: ${prediction.nextPrice}
             </div>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Based on 20-day moving average analysis
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">AI Analysis</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">AI Analysis</h3>
             {isLoading ? (
-              <p className="text-gray-600">Loading AI prediction...</p>
-            ) : (
-              <div className="text-lg">
-                {aiPrediction || "AI prediction unavailable"}
+              <p className="text-muted-foreground">Loading AI prediction...</p>
+            ) : aiResult ? (
+              <div className="space-y-3 bg-accent/50 rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  {aiResult.direction === "UP" ? (
+                    <ArrowTrendingUpIcon className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <ArrowTrendingDownIcon className="h-5 w-5 text-red-500" />
+                  )}
+                  <span className="font-semibold">Direction:</span>
+                  <span className={aiResult.direction === "UP" ? "text-green-500" : "text-red-500"}>
+                    {aiResult.direction}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Expected Change:</span>
+                  <span>{aiResult.percentage}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold">Analysis:</span>
+                  <span className="text-sm">{aiResult.reasoning}</span>
+                </div>
               </div>
+            ) : (
+              <p className="text-muted-foreground">AI prediction unavailable</p>
             )}
           </div>
         </div>
