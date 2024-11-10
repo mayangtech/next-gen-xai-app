@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { sendMessage } from "@/utils/xai-api";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from "lucide-react";
+import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 
 interface StockPredictionProps {
   data: Array<{
@@ -82,9 +82,9 @@ export const StockPrediction = ({ data, symbol }: StockPredictionProps) => {
               <div className="space-y-3 bg-accent/50 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   {aiResult.direction === "UP" ? (
-                    <ArrowTrendingUpIcon className="h-5 w-5 text-green-500" />
+                    <TrendingUpIcon className="h-5 w-5 text-green-500" />
                   ) : (
-                    <ArrowTrendingDownIcon className="h-5 w-5 text-red-500" />
+                    <TrendingDownIcon className="h-5 w-5 text-red-500" />
                   )}
                   <span className="font-semibold">Direction:</span>
                   <span className={aiResult.direction === "UP" ? "text-green-500" : "text-red-500"}>
