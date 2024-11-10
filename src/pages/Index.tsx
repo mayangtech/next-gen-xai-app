@@ -8,6 +8,7 @@ import { StockPrediction } from "@/components/StockPrediction";
 import { StockAnalysis } from "@/components/StockAnalysis";
 import { MarketNews } from "@/components/MarketNews";
 import { useStockData } from "@/hooks/useStockData";
+import { LineChart } from "lucide-react";
 
 const Index = () => {
   const [symbol, setSymbol] = useState("");
@@ -28,25 +29,41 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <Card className="mx-auto max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/5 p-4 md:p-8">
+      <Card className="mx-auto max-w-6xl shadow-lg">
         <div className="p-6">
-          <h1 className="text-3xl font-bold mb-6">Stock Analysis Dashboard</h1>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary p-3 rounded-lg">
+                <LineChart className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Market Analysis Pro
+                </h1>
+                <p className="text-muted-foreground">Real-time market insights and analysis</p>
+              </div>
+            </div>
+          </div>
           
           <form onSubmit={handleSubmit} className="flex gap-4 mb-8">
             <Input
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
               placeholder="Enter stock symbol (e.g., AAPL)"
-              className="max-w-xs"
+              className="max-w-xs bg-white/50 border-accent/20"
             />
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="bg-secondary hover:bg-secondary/90 text-white"
+            >
               Analyze
             </Button>
           </form>
 
           {error && (
-            <div className="text-red-500 mb-4">
+            <div className="text-destructive mb-4">
               Error fetching stock data. Please try again.
             </div>
           )}
