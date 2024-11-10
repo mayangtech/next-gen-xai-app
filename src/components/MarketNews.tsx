@@ -7,7 +7,7 @@ export const MarketNews = () => {
   const { data: newsAnalysis, isLoading } = useQuery({
     queryKey: ["marketNews"],
     queryFn: async () => {
-      const prompt = "Analyze the current stock market conditions and provide 3 key news highlights with sentiment analysis. Format: NEWS: [news] | SENTIMENT: [positive/negative/neutral] | IMPACT: [brief explanation]";
+      const prompt = "Analyze the current stock market conditions and provide 5 key news highlights with sentiment analysis. Format: NEWS: [news] | SENTIMENT: [positive/negative/neutral] | IMPACT: [brief explanation]";
       const response = await sendMessage(prompt);
       return response.choices[0].message.content;
     },
