@@ -24,13 +24,18 @@ const Index = () => {
 
     try {
       const response = await sendMessage(input);
-      setMessages((prev) => [...prev, { role: "assistant", content: response.message }]);
+      if (response.choices && response.choices[0]?.message) {
+        setMessages((prev) => [...prev, response.choices[0].message]);
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to get response from AI",
         variant: "destructive",
       });
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
