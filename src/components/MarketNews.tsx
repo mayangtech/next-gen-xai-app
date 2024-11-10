@@ -14,7 +14,9 @@ export const MarketNews = () => {
     refetchInterval: 1000 * 60 * 15, // Refetch every 15 minutes
   });
 
-  const renderSentimentIcon = (sentiment: string) => {
+  const renderSentimentIcon = (sentiment: string | undefined) => {
+    if (!sentiment) return <Minus className="text-gray-500" />;
+    
     switch (sentiment.toLowerCase()) {
       case "positive":
         return <ArrowUp className="text-green-500" />;
@@ -31,18 +33,22 @@ export const MarketNews = () => {
     return newsAnalysis.split('\n').map((item, index) => {
       if (!item.trim()) return null;
 
-      const [news, sentiment, impact] = item.split('|').map(part => {
-        const [label, value] = part.split(':');
-        return value?.trim() || '';
-      });
+      const parts = item.split('|');
+      if (parts.length !== 3) return null;
 
-      const sentimentValue = sentiment?.replace(/[\[\]]/g, '').trim();
+      const [newsSection, sentimentSection, impactSection] = parts;
+      
+      const news = newsSection?.split(':')[1]?.trim() || '';
+      const sentiment = sentimentSection?.split(':')[1]?.trim().replace(/[\[\]]/g, '') || '';
+      const impact = impactSection?.split(':')[1]?.trim() || '';
+
+      if (!news) return null;
 
       return (
         <div key={index} className="bg-card hover:bg-accent/50 transition-colors rounded-lg p-4 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="mt-1">
-              {renderSentimentIcon(sentimentValue)}
+              {renderSentimentIcon(sentiment)}
             </div>
             <div className="flex-1">
               <p className="font-medium text-foreground mb-2">{news}</p>
@@ -50,16 +56,16 @@ export const MarketNews = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-muted-foreground">Sentiment:</span>
                   <span className={`text-sm ${
-                    sentimentValue.toLowerCase() === "positive" ? "text-green-500" :
-                    sentimentValue.toLowerCase() === "negative" ? "text-red-500" :
+                    sentiment.toLowerCase() === "positive" ? "text-green-500" :
+                    sentiment.toLowerCase() === "negative" ? "text-red-500" :
                     "text-gray-500"
                   }`}>
-                    {sentimentValue}
+                    {sentiment || 'Neutral'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-muted-foreground">Impact:</span>
-                  <span className="text-sm text-foreground">{impact}</span>
+                  <span className="text-sm text-foreground">{impact || 'No impact analysis available'}</span>
                 </div>
               </div>
             </div>
