@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { StockChart } from "@/components/StockChart";
 import { StockPrediction } from "@/components/StockPrediction";
 import { StockAnalysis } from "@/components/StockAnalysis";
+import { MarketNews } from "@/components/MarketNews";
 import { useStockData } from "@/hooks/useStockData";
 
 const Index = () => {
@@ -62,6 +63,8 @@ const Index = () => {
               </div>
             </div>
           )}
+          
+          <MarketNews />
         </div>
       </Card>
     </div>
