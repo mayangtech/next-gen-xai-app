@@ -10,8 +10,16 @@ export const sendMessage = async (message: string) => {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4-0613",  // Updated to use a standard GPT-4 model identifier
-        messages: [{ role: "user", content: message }],
+        model: "grok-beta",
+        messages: [
+          {
+            role: "system",
+            content: "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
+          },
+          { role: "user", content: message }
+        ],
+        stream: false,
+        temperature: 0
       }),
     });
 
