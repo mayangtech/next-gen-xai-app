@@ -54,7 +54,10 @@ const Index = () => {
             <div className="space-y-8">
               <StockChart data={stockData.timeSeriesData} />
               <div className="grid md:grid-cols-2 gap-6">
-                <StockPrediction data={stockData.timeSeriesData} />
+                <StockPrediction 
+                  data={stockData.timeSeriesData} 
+                  symbol={stockData.metadata.symbol} 
+                />
                 <StockAnalysis data={stockData} />
               </div>
             </div>
