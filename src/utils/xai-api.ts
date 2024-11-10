@@ -10,7 +10,7 @@ export const sendMessage = async (message: string) => {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",  // Updated to use the correct xAI model
+        model: "gpt-4-0613",  // Updated to use a standard GPT-4 model identifier
         messages: [{ role: "user", content: message }],
       }),
     });
