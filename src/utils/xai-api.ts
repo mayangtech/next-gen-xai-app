@@ -1,5 +1,5 @@
 const API_KEY = import.meta.env.VITE_XAI_API_KEY;
-const API_URL = "https://api.xai.com/v1/chat"; // Replace with actual xAI API endpoint
+const API_URL = "https://api.x.ai/v1/chat/completions";
 
 export const sendMessage = async (message: string) => {
   try {
