@@ -2,81 +2,64 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import { sendMessage } from "@/utils/xai-api";
-import { Loader2 } from "lucide-react";
+import { StockChart } from "@/components/StockChart";
+import { StockPrediction } from "@/components/StockPrediction";
+import { StockAnalysis } from "@/components/StockAnalysis";
+import { useStockData } from "@/hooks/useStockData";
 
 const Index = () => {
-  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [symbol, setSymbol] = useState("");
   const { toast } = useToast();
+  const { data: stockData, isLoading, error, refetch } = useStockData(symbol);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const response = await sendMessage(input);
-      if (response.choices && response.choices[0]?.message) {
-        setMessages((prev) => [...prev, response.choices[0].message]);
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (error) {
+    if (!symbol.trim()) {
       toast({
         title: "Error",
-        description: "Failed to get response from AI",
+        description: "Please enter a stock symbol",
         variant: "destructive",
       });
-      console.error("Error:", error);
-    } finally {
-      setIsLoading(false);
+      return;
     }
+    refetch();
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <Card className="mx-auto max-w-4xl h-[80vh] flex flex-col">
-        <div className="p-4 border-b">
-          <h1 className="text-2xl font-bold text-center">xAI Chat Interface</h1>
-        </div>
-        
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`p-4 rounded-lg ${
-                  message.role === "user"
-                    ? "bg-blue-100 ml-auto max-w-[80%]"
-                    : "bg-gray-100 mr-auto max-w-[80%]"
-                }`}
-              >
-                {message.content}
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+      <Card className="mx-auto max-w-6xl">
+        <div className="p-6">
+          <h1 className="text-3xl font-bold mb-6">Stock Analysis Dashboard</h1>
+          
+          <form onSubmit={handleSubmit} className="flex gap-4 mb-8">
+            <Input
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              placeholder="Enter stock symbol (e.g., AAPL)"
+              className="max-w-xs"
+            />
+            <Button type="submit" disabled={isLoading}>
+              Analyze
+            </Button>
+          </form>
 
-        <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
-          </Button>
-        </form>
+          {error && (
+            <div className="text-red-500 mb-4">
+              Error fetching stock data. Please try again.
+            </div>
+          )}
+
+          {stockData && (
+            <div className="space-y-8">
+              <StockChart data={stockData.timeSeriesData} />
+              <div className="grid md:grid-cols-2 gap-6">
+                <StockPrediction data={stockData.timeSeriesData} />
+                <StockAnalysis data={stockData} />
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   );
